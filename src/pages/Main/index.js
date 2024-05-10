@@ -1,21 +1,50 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Container, Form, SubmitButton, List, DeleteButton } from "./styles";
 import { FaGithub, FaPlus, FaSpinner, FaBars, FaTrash } from "react-icons/fa";
 
 import api from "../../services/api";
+import { Link } from "react-router-dom";
 
 export default function Main() {
   const [newRepo, setNewRepo] = useState("");
   const [repositorios, setRepositorios] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
+
+  // DidMount  Buscar
+
+  useEffect(() => {
+    const repoStorage = localStorage.getItem("repos");
+
+    if (repoStorage) {
+      setRepositorios(JSON.parse(repoStorage));
+    }
+  }, []);
+
+  //DidUpdate  Salvar Alteracoes
+
+  useEffect(() => {
+    localStorage.setItem("repos", JSON.stringify(repositorios));
+  }, [repositorios]);
 
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
       async function submit() {
         setLoading(true);
+        setAlert(null);
         try {
+          if (newRepo === "") {
+            throw new Error("Você precisa indicar um repositorio!");
+          }
+
           const response = await api.get(`repos/${newRepo}`);
+
+          const hasRepo = repositorios.find((repo) => repo.name === newRepo);
+
+          if (hasRepo) {
+            throw new Error("Repositorio Duplicado");
+          }
 
           const data = {
             name: response.data.full_name,
@@ -24,6 +53,7 @@ export default function Main() {
           setRepositorios([...repositorios, data]);
           setNewRepo("");
         } catch (err) {
+          setAlert(true);
           console.log(err);
         } finally {
           setLoading(false);
@@ -37,6 +67,7 @@ export default function Main() {
 
   function handleinputChange(e) {
     setNewRepo(e.target.value);
+    setAlert(null);
   }
 
   const handleDelete = useCallback(
@@ -54,7 +85,7 @@ export default function Main() {
         Meus Repositorios
       </h1>
 
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} error={alert}>
         <input
           type="text"
           placeholder="Adicionar Repositorios"
@@ -80,9 +111,9 @@ export default function Main() {
               </DeleteButton>
               {repo.name}
             </span>
-            <a href="#">
+            <Link href="#">
               <FaBars size={20} />
-            </a>
+            </Link>
           </li>
         ))}
       </List>
