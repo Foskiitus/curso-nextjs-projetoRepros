@@ -1,7 +1,13 @@
 import Routess from "./routes";
+import GlobalStyle from "./pages/styles/global";
 
 function App() {
-  return <Routess />;
+  return (
+    <>
+      <GlobalStyle />
+      <Routess />;
+    </>
+  );
 }
 
 export default App;
