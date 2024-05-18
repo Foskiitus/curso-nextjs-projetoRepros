@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+This project is part of a course in UDemy [Nextjs do Basico ao avançado](https://www.udemy.com/course/nextjs-zero-ao-avancado/?couponCode=LEADERSALE24TRFR)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
